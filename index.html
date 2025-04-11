@@ -25,9 +25,7 @@
         <div class="admin-container">
 
             <h1>Samiksha Tex Content Manager</h1>
-            <div id="status-message" class="status"></div>
-
-            <section class="admin-section">
+            <div id="status-message" class="status"></div> <div id="delete-status-message" class="status"></div> <section class="admin-section">
                 <h2>Add New Gallery Item</h2>
                 <form id="add-gallery-form">
                     <div class="form-group">
@@ -49,9 +47,7 @@
                     <button type="submit" class="submit-button">Add to Gallery</button>
                 </form>
             </section>
-
             <hr>
-
             <section class="admin-section">
                 <h2>Add New Arrival Item</h2>
                 <form id="add-arrival-form">
@@ -70,6 +66,25 @@
                     <button type="submit" class="submit-button">Add to New Arrivals</button>
                 </form>
             </section>
+
+            <hr>
+
+            <section class="admin-section">
+                <h2>Manage Existing Gallery Items</h2>
+                <div id="current-gallery-items" class="item-list-container">
+                    <p class="loading-indicator">Loading gallery items...</p>
+                    </div>
+            </section>
+
+            <hr>
+
+             <section class="admin-section">
+                <h2>Manage Existing New Arrival Items</h2>
+                <div id="current-arrival-items" class="item-list-container">
+                     <p class="loading-indicator">Loading new arrival items...</p>
+                    </div>
+            </section>
+
         </div>
     </div>
 
