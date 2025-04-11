@@ -1,4 +1,4 @@
-/* Basic Admin Styles */
+/* Basic Admin Styles & Login/Logout Styles */
 :root {
     --primary-color: #800000;
     --secondary-color: #B8860B;
@@ -16,23 +16,74 @@ body {
     background-color: var(--background-light);
     color: var(--text-dark);
     margin: 0;
-    padding: 20px;
+    padding: 20px; /* Padding for spacing */
     line-height: 1.6;
+    /* Center content vertically (useful for login form) */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Default alignment for login */
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
-.admin-container {
-    max-width: 700px;
-    margin: 20px auto;
-    padding: 25px;
+/* Login Container Styles */
+.login-container {
+    max-width: 400px;
+    width: 100%; /* Responsive width */
+    padding: 30px;
     background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    text-align: center;
+    /* Login section is shown/hidden by JS */
 }
 
+.login-container h1 {
+    margin-top: 0; /* Remove default top margin */
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+#login-error {
+    margin-top: 1rem;
+    font-size: 0.9em;
+    min-height: 1.2em; /* Prevent layout shift */
+}
+
+
+/* Main Admin Content Styling */
+#admin-content {
+    display: none; /* Hide by default, shown by JS */
+    width: 100%;
+    max-width: 800px; /* Adjust max-width as needed */
+    position: relative; /* For logout button positioning */
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 25px 30px; /* Padding inside the main content area */
+    margin: 20px 0; /* Margin for spacing when visible */
+    box-sizing: border-box;
+}
+
+/* Styles for the actual form container *within* #admin-content */
+#admin-content .admin-container {
+    max-width: 100%; /* Take full width of parent */
+    margin: 0; /* Reset margin */
+    padding: 0; /* Reset padding */
+    background-color: transparent; /* Inherit background */
+    box-shadow: none; /* Remove inner shadow */
+    border-radius: 0; /* Remove inner border-radius */
+}
+
+/* Shared Form Styles */
 h1, h2 {
     color: var(--primary-color);
     text-align: center;
     margin-bottom: 1.5rem;
+}
+/* Adjust heading margin when inside admin content */
+#admin-content h1 {
+    margin-top: 0;
 }
 
 h2 {
@@ -53,23 +104,27 @@ hr {
 }
 
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
+    text-align: left; /* Align labels/inputs left */
 }
 
 label {
     display: block;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
     font-weight: bold;
+    font-size: 0.95rem;
 }
 
 input[type="text"],
-input[type="url"] {
+input[type="url"],
+input[type="password"] { /* Add password input styling */
     width: 100%;
-    padding: 10px;
+    padding: 10px 12px;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: 5px;
     box-sizing: border-box; /* Include padding in width */
     font-size: 1rem;
+    color: var(--text-dark);
 }
 
 input:focus {
@@ -78,11 +133,12 @@ input:focus {
     box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.2);
 }
 
+/* Submit Button Styles (for Login and Add forms) */
 .submit-button {
     display: inline-block;
     background: var(--primary-color);
     color: #fff;
-    padding: 10px 20px;
+    padding: 10px 25px; /* Consistent padding */
     border-radius: 5px;
     font-weight: bold;
     font-size: 1rem;
@@ -102,26 +158,56 @@ input:focus {
     cursor: not-allowed;
 }
 
+/* Status Message Styles (for Add forms and Login errors) */
 .status {
     padding: 10px 15px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem; /* Adjust spacing */
     border-radius: 4px;
     text-align: center;
     font-weight: 500;
     min-height: 1.5em; /* Prevent layout shift */
     display: none; /* Hidden by default */
+    border: 1px solid transparent; /* Base border */
+    box-sizing: border-box;
 }
+/* Specifically target status message inside admin content */
+#admin-content #status-message {
+    margin-top: 1.5rem; /* Add space above */
+}
+
 
 .status.success {
     color: var(--success-color);
     background-color: var(--success-bg);
-    border: 1px solid var(--success-color);
+    border-color: var(--success-color); /* Use border-color */
     display: block;
 }
 
 .status.error {
     color: var(--error-color);
     background-color: var(--error-bg);
-    border: 1px solid var(--error-color);
+    border-color: var(--error-color); /* Use border-color */
     display: block;
+}
+
+
+/* Logout Button Styles */
+.logout-button {
+    position: absolute;
+    top: 15px;
+    right: 20px; /* Position inside #admin-content */
+    background-color: #6c757d; /* Grey color */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    z-index: 10; /* Ensure it's above other content if overlap occurs */
+}
+
+.logout-button:hover {
+    background-color: #5a6268;
 }
