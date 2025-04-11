@@ -1,12 +1,16 @@
+// ==========================================================================
+// ================== Full JavaScript for admin.html ========================
+// ==========================================================================
+
 document.addEventListener('DOMContentLoaded', () => {
     // !!! IMPORTANT: Replace with your DEPLOYED Google Apps Script URL !!!
-    // This URL is for ADDING Gallery and New Arrivals data.
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTGtpBQE3GM-y-IkPaqET8l_jLhefXGB9DdL3gI_dMlUjmMklLIdaMCzQ_EsKeom9L/exec";
+    // This URL is for ADDING/DELETING/FETCHING Gallery and New Arrivals data.
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxW-Pbd0molCtMgesFI7aWt2bk3dBKaIsZWxvLiRDathxHWkRFC_HWokVCHC1pix3A1/exec";
 
     // --- VERY INSECURE: Hardcoded Password ---
     // Replace 'yourSecretPassword' with the password you want to use.
-    // REMINDER: THIS IS VISIBLE IN BROWSER SOURCE CODE. NOT SECURE.
-    const ADMIN_PASSWORD = '@surat1017';
+    // REMINDER: THIS IS VISIBLE IN BROWSER SOURCE CODE. NOT SECURE AT ALL.
+    const ADMIN_PASSWORD = '1234';
     // -----------------------------------------
 
     // --- Get DOM Elements ---
@@ -20,25 +24,196 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get elements within the admin content area
     const galleryForm = document.getElementById('add-gallery-form');
     const arrivalForm = document.getElementById('add-arrival-form');
-    const statusMessage = document.getElementById('status-message'); // Status for add forms
+    const statusMessage = document.getElementById('status-message'); // Status for ADD actions
+    const deleteStatusMessage = document.getElementById('delete-status-message'); // Status for DELETE actions
+    const galleryItemsContainer = document.getElementById('current-gallery-items');
+    const arrivalItemsContainer = document.getElementById('current-arrival-items');
 
     // --- Helper Functions for Showing/Hiding Sections ---
     function showLoginForm() {
         if (loginSection) loginSection.style.display = 'block';
         if (adminContent) adminContent.style.display = 'none';
-        // Center the login form vertically
-        document.body.style.alignItems = 'center';
+        document.body.style.alignItems = 'center'; // Center login form vertically
     }
 
     function showAdminContent() {
         if (loginSection) loginSection.style.display = 'none';
         if (adminContent) adminContent.style.display = 'block';
-        // Align body content to the top when admin panel is visible
-        document.body.style.alignItems = 'flex-start';
+        document.body.style.alignItems = 'flex-start'; // Align content to top
+        // Fetch existing items when showing admin content
+        fetchAndDisplayItems();
     }
 
+    // --- Status Message Function ---
+    function showStatus(element, message, isError = false, duration = 6000) {
+        if (!element) return;
+        element.textContent = message;
+        element.className = 'status ' + (isError ? 'error' : 'success');
+        element.style.display = 'block';
+        setTimeout(() => {
+           if (element.textContent === message) {
+             element.style.display = 'none';
+             element.textContent = '';
+             element.className = 'status';
+           }
+        }, isError ? duration + 2000 : duration);
+    }
+
+    // --- Fetch and Display Existing Items ---
+    async function fetchAndDisplayItems() {
+        if (!galleryItemsContainer || !arrivalItemsContainer) {
+             console.error("Item display containers not found."); return;
+        }
+        galleryItemsContainer.innerHTML = '<p class="loading-indicator">Loading gallery items...</p>';
+        arrivalItemsContainer.innerHTML = '<p class="loading-indicator">Loading new arrival items...</p>';
+
+        if (SCRIPT_URL === "YOUR_DEPLOYED_APPS_SCRIPT_URL_HERE" || !SCRIPT_URL) {
+            const errorMsg = "Cannot load items: Admin Apps Script URL is not configured.";
+            showStatus(statusMessage, errorMsg, true, 10000);
+            galleryItemsContainer.innerHTML = `<p style="color:red;">${errorMsg}</p>`;
+            arrivalItemsContainer.innerHTML = `<p style="color:red;">${errorMsg}</p>`;
+            return;
+        }
+
+        try {
+            // Use GET for fetching data
+            const response = await fetch(`${SCRIPT_URL}?action=getData&v=${Date.now()}`, {
+                 method: 'GET', // Explicitly GET for fetching
+                 cache: 'no-store'
+            });
+            if (!response.ok) {
+                let errorText = `Failed to fetch items (Status: ${response.status})`;
+                try { const err = await response.json(); errorText = err.message || err.error || errorText; } catch(e){}
+                throw new Error(errorText);
+            }
+            const data = await response.json();
+            if (data.error) throw new Error(`Error from server: ${data.error}`);
+
+            // Display Gallery Items
+            galleryItemsContainer.innerHTML = '';
+            if (data.gallery && Array.isArray(data.gallery) && data.gallery.length > 0) {
+                data.gallery.forEach(item => galleryItemsContainer.appendChild(createItemElement(item, 'gallery')));
+            } else {
+                galleryItemsContainer.innerHTML = '<p>No gallery items found.</p>';
+            }
+
+            // Display Arrival Items
+            arrivalItemsContainer.innerHTML = '';
+            if (data.newArrivals && Array.isArray(data.newArrivals) && data.newArrivals.length > 0) {
+                data.newArrivals.forEach(item => arrivalItemsContainer.appendChild(createItemElement(item, 'arrival')));
+            } else {
+                arrivalItemsContainer.innerHTML = '<p>No new arrival items found.</p>';
+            }
+
+        } catch (error) {
+            console.error("Error fetching items:", error);
+            const errorText = `Error loading items: ${error.message}`;
+            showStatus(statusMessage, errorText, true, 10000);
+             galleryItemsContainer.innerHTML = `<p style="color:red;">${errorText}</p>`;
+             arrivalItemsContainer.innerHTML = `<p style="color:red;">${errorText}</p>`;
+        }
+    }
+
+    // --- Helper to Create HTML for Each Item ---
+    function createItemElement(item, itemType) {
+        if (!item || !item.ID) {
+            console.warn("Skipping item render due to missing ID:", item);
+            return document.createDocumentFragment(); // Return empty, non-renderable fragment
+        }
+
+        const div = document.createElement('div');
+        div.className = 'manage-item';
+        div.dataset.itemId = item.ID;
+
+        const detailsDiv = document.createElement('div');
+        detailsDiv.className = 'item-details';
+
+        const img = document.createElement('img');
+        img.src = item.ImageURL || 'images/placeholder.png';
+        img.alt = item.Title || 'Item image';
+        img.className = 'item-thumbnail';
+        img.onerror = () => { img.src = 'images/placeholder.png'; img.alt = 'Invalid image'; };
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'item-text';
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = item.Title || '(No Title)';
+        titleSpan.title = item.Title || '';
+        const descSpan = document.createElement('span');
+        descSpan.textContent = item.Description || '(No Description)';
+        descSpan.title = item.Description || '';
+        textDiv.appendChild(titleSpan);
+        textDiv.appendChild(descSpan);
+
+        detailsDiv.appendChild(img);
+        detailsDiv.appendChild(textDiv);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'delete-button';
+        deleteButton.textContent = 'Delete';
+        deleteButton.dataset.id = item.ID;
+        deleteButton.dataset.type = itemType;
+
+        div.appendChild(detailsDiv);
+        div.appendChild(deleteButton);
+        return div;
+    }
+
+    // --- Handle Delete Request ---
+    async function sendDeleteRequest(itemId, itemType) {
+        if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
+            showStatus(deleteStatusMessage, "Error: Not logged in.", true);
+            showLoginForm(); return;
+        }
+
+        const action = itemType === 'gallery' ? 'deleteGalleryItem' : 'deleteArrivalItem';
+        const payload = { action: action, id: itemId };
+
+        const deleteButton = document.querySelector(`.delete-button[data-id="${itemId}"][data-type="${itemType}"]`);
+        if(deleteButton) deleteButton.disabled = true;
+        showStatus(deleteStatusMessage, `Deleting ${itemType} item (ID: ${itemId})...`, false);
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                // --- Use POST for delete actions ---
+                method: 'POST',
+                // ----------------------------------
+                mode: 'cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                 let errorText = `HTTP error! Status: ${response.status}`;
+                 try { const err = await response.json(); errorText = err.message || err.error || errorText; } catch (e) {}
+                 throw new Error(errorText);
+            }
+            const result = await response.json();
+
+            if (result.result === 'success') {
+                showStatus(deleteStatusMessage, result.message || 'Item deleted successfully.', false);
+                const itemElement = document.querySelector(`.manage-item[data-item-id="${itemId}"]`);
+                if (itemElement) {
+                    itemElement.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                    itemElement.style.opacity = '0';
+                    itemElement.style.transform = 'translateX(-20px)'; // Slide out effect
+                    setTimeout(() => itemElement.remove(), 500);
+                }
+            } else {
+                throw new Error(result.message || result.error || 'Deletion failed.');
+            }
+
+        } catch (error) {
+            console.error("Delete Error:", error);
+            showStatus(deleteStatusMessage, `Error deleting item: ${error.message}`, true, 8000);
+             if(deleteButton) deleteButton.disabled = false; // Re-enable on error
+        }
+    }
+
+
     // --- Check Login Status on Page Load ---
-    // sessionStorage clears when the browser tab is closed.
     if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
         showAdminContent();
     } else {
@@ -48,159 +223,118 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Login Form Handler ---
     if (loginForm && passwordInput && loginError) {
         loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const enteredPassword = passwordInput.value;
-
-            if (enteredPassword === ADMIN_PASSWORD) {
-                // --- Password Correct ---
-                sessionStorage.setItem('isAdminLoggedIn', 'true'); // Set login flag
-                showAdminContent(); // Show the main admin forms
-                passwordInput.value = ''; // Clear password field
-                loginError.style.display = 'none'; // Hide any previous error message
-                loginError.textContent = ''; // Clear error text
-            } else {
-                // --- Password Incorrect ---
-                loginError.textContent = 'Invalid password. Please try again.';
-                loginError.style.display = 'block'; // Show error message
-                passwordInput.value = ''; // Clear password field
-                passwordInput.focus(); // Focus back on password field
-                sessionStorage.removeItem('isAdminLoggedIn'); // Ensure flag is removed
-            }
+             e.preventDefault();
+             const enteredPassword = passwordInput.value;
+             if (enteredPassword === ADMIN_PASSWORD) {
+                 sessionStorage.setItem('isAdminLoggedIn', 'true');
+                 showAdminContent(); // Calls fetchAndDisplayItems inside
+                 passwordInput.value = '';
+                 loginError.style.display = 'none';
+                 loginError.textContent = '';
+             } else {
+                 loginError.textContent = 'Invalid password.';
+                 loginError.style.display = 'block';
+                 passwordInput.value = '';
+                 passwordInput.focus();
+                 sessionStorage.removeItem('isAdminLoggedIn');
+             }
         });
-    } else {
-        console.error("Login form elements (form, password input, or error display) not found!");
-        // Optionally display an error to the user if login form is broken
-        if(loginSection) loginSection.innerHTML = "<h2>Login form error. Please contact support.</h2>";
-    }
-
+     } else { console.error("Login form elements missing!"); }
 
     // --- Logout Button Handler ---
     if (logoutButton) {
         logoutButton.addEventListener('click', () => {
-            sessionStorage.removeItem('isAdminLoggedIn'); // Remove login flag
-            showLoginForm(); // Show the login form again
+            sessionStorage.removeItem('isAdminLoggedIn');
+             if(galleryItemsContainer) galleryItemsContainer.innerHTML = ''; // Clear items visually
+             if(arrivalItemsContainer) arrivalItemsContainer.innerHTML = '';
+            showLoginForm();
         });
-    } else {
-         console.warn("Logout button not found!"); // Warn if button is missing
-    }
+    } else { console.warn("Logout button missing!"); }
 
-
-    // --- Admin Form Submission Logic ---
-    // Handles submitting data for Gallery and New Arrivals to Google Apps Script
-
-    function showStatus(message, isError = false) {
-        if (!statusMessage) {
-            console.warn("Status message element not found.");
-            return; // Exit if status element doesn't exist
-        }
-        statusMessage.textContent = message;
-        // Use CSS classes for styling success/error states
-        statusMessage.className = 'status ' + (isError ? 'error' : 'success');
-        statusMessage.style.display = 'block'; // Make sure it's visible
-
-        // Hide message after a delay
-        setTimeout(() => {
-           // Only hide if the message hasn't changed in the meantime
-           if (statusMessage.textContent === message) {
-             statusMessage.style.display = 'none';
-             statusMessage.textContent = '';
-             statusMessage.className = 'status'; // Reset class
-           }
-        }, isError ? 8000 : 6000); // Show errors slightly longer
-    }
-
+    // --- ADD Form Submission Handler ---
     function handleFormSubmit(form, action) {
-        // Ensure form exists before adding listener
         if (!form) {
-            console.warn(`Form element not found for action: ${action}`);
+            console.warn(`Add form element not found for action: ${action}`);
             return;
         }
-
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent default HTML form submission
+             e.preventDefault();
+             if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
+                showStatus(statusMessage, "Error: Not logged in.", true);
+                showLoginForm(); return;
+             }
+             const submitButton = form.querySelector('button[type="submit"]');
+             if (submitButton) submitButton.disabled = true;
+             showStatus(statusMessage, `Adding ${action.includes('Gallery') ? 'gallery' : 'arrival'} item...`, false);
+             const formData = new FormData(form);
+             const dataPayload = { action: action };
+             for (let [key, value] of formData.entries()) { dataPayload[key] = value; }
 
-             // --- Double-check login status before allowing submission ---
-            if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
-                showStatus("Error: You are not logged in. Please log in again.", true);
-                showLoginForm(); // Force back to login screen
-                return; // Stop the submission
-            }
+             if (SCRIPT_URL === "YOUR_DEPLOYED_APPS_SCRIPT_URL_HERE" || !SCRIPT_URL) {
+                 showStatus(statusMessage, "Admin Panel Error: Google Apps Script URL is not set.", true);
+                 if (submitButton) submitButton.disabled = false; return;
+             }
 
-            const submitButton = form.querySelector('button[type="submit"]');
-            if (submitButton) submitButton.disabled = true; // Disable button during submission
-            showStatus('Submitting data...', false); // Show processing message
+             try {
+                 // --- Ensure POST method is used for adding items ---
+                 const response = await fetch(SCRIPT_URL, {
+                     method: 'POST', // <<<--- CORRECT METHOD FOR ADDING
+                     mode: 'cors',
+                     cache: 'no-cache',
+                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                     body: JSON.stringify(dataPayload)
+                 });
+                 // --------------------------------------------------
 
-            const formData = new FormData(form);
-            const dataPayload = { action: action }; // Include the action type
-            // Convert FormData entries to a plain object
-            for (let [key, value] of formData.entries()) {
-                dataPayload[key] = value;
-            }
-
-            // --- Check if the Google Apps Script URL is configured ---
-            if (SCRIPT_URL === "YOUR_DEPLOYED_APPS_SCRIPT_URL_HERE" || !SCRIPT_URL) {
-                const errorMsg = "Admin Panel Error: Google Apps Script URL is not configured in admin.js.";
-                showStatus(errorMsg, true);
-                console.error("CRITICAL: Set the SCRIPT_URL variable in admin.js");
-                if (submitButton) submitButton.disabled = false; // Re-enable button
-                return; // Stop submission
-            }
-
-
-            // --- Send data to Google Apps Script ---
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'cors', // Required for cross-origin requests
-                    cache: 'no-cache', // Don't cache POST requests
-                    // Sending JSON is generally preferred if GAS is set up for it
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8', // Send as plain text to avoid CORS preflight, GAS parses `e.postData.contents`
-                    },
-                    body: JSON.stringify(dataPayload), // Stringify the data payload
-                    // redirect: 'follow' // Default behavior
-                });
-
-                // Check if the response was successful
                  if (!response.ok) {
-                    // Try to parse error details from response body if possible
-                    let errorText = `HTTP error! Status: ${response.status}`;
-                    try {
-                        const errorBody = await response.json(); // Try parsing JSON error
-                        // Use error message from GAS if available
-                        errorText = errorBody.message || errorBody.error || errorText;
-                    } catch (parseError) {
-                       // If body isn't JSON or can't be parsed, use status text
-                       errorText = response.statusText || errorText;
-                    }
-                    throw new Error(errorText); // Throw error to be caught below
+                     let errorText = `HTTP error! Status: ${response.status}`;
+                     try { const err = await response.json(); errorText = err.message || err.error || errorText;} catch(e){}
+                     throw new Error(errorText);
                  }
-
-                // Parse the JSON response from GAS
-                const result = await response.json();
-
-                // Check the result indicator from GAS
-                if (result.result === "success") {
-                    showStatus(result.message || 'Item added successfully!', false);
-                    form.reset(); // Clear the form fields on success
-                } else {
-                    // Throw error if GAS indicates failure
-                    throw new Error(result.message || result.error || 'An unknown error occurred during submission.');
-                }
-
-            } catch (error) {
-                // Catch fetch errors or errors thrown from response handling
-                console.error('Submission Error:', error);
-                showStatus(`Error: ${error.message}`, true); // Display error message to user
-            } finally {
-                // --- Re-enable submit button regardless of success or failure ---
-                if (submitButton) submitButton.disabled = false;
-            }
+                 const result = await response.json();
+                 if (result.result === "success") {
+                     showStatus(statusMessage, result.message || 'Item added successfully!', false);
+                     form.reset();
+                     // Refresh the item list view after adding
+                     fetchAndDisplayItems();
+                 } else { throw new Error(result.message || result.error || 'Failed to add item.'); }
+             } catch (error) {
+                 console.error('Submission Error:', error);
+                 showStatus(statusMessage, `Error adding item: ${error.message}`, true);
+             } finally {
+                 if (submitButton) submitButton.disabled = false;
+             }
         });
     } // --- End handleFormSubmit ---
 
-    // --- Initialize the form submission handlers ---
+    // --- Initialize the ADD form submission handlers ---
     handleFormSubmit(galleryForm, 'addGalleryItem');
     handleFormSubmit(arrivalForm, 'addArrivalItem');
+
+    // --- Event Delegation for DELETE Buttons ---
+    function setupDeleteListeners() {
+        const adminContentDiv = document.getElementById('admin-content');
+        if (adminContentDiv) {
+            adminContentDiv.addEventListener('click', (event) => {
+                const deleteButton = event.target.closest('.delete-button'); // Find button even if icon inside is clicked
+                if (deleteButton) {
+                    const itemId = deleteButton.dataset.id;
+                    const itemType = deleteButton.dataset.type;
+                    if (itemId && itemType) {
+                        if (confirm(`DELETE Item?\n\nType: ${itemType}\nID: ${itemId}\n\nThis action cannot be undone.`)) {
+                            sendDeleteRequest(itemId, itemType);
+                        }
+                    } else {
+                         console.error("Delete button missing ID or Type data.");
+                         showStatus(deleteStatusMessage, "Error: Could not identify item to delete.", true);
+                    }
+                }
+            });
+        } else {
+             console.error("#admin-content container not found for delete listeners.");
+        }
+    }
+    // Set up delete listeners once the DOM is ready
+    setupDeleteListeners();
 
 }); // --- End DOMContentLoaded ---
