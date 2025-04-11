@@ -1,213 +1,373 @@
-/* Basic Admin Styles & Login/Logout Styles */
+/* ========================================== */
+/* Full CSS for admin.html (Admin Panel)      */
+/* ========================================== */
+
+/* --- Base Variables & Reset --- */
 :root {
-    --primary-color: #800000;
-    --secondary-color: #B8860B;
-    --background-light: #FAF0E6;
+    --primary-color: #800000;    /* Deep Maroon */
+    --secondary-color: #B8860B;  /* DarkGoldenrod (Gold Accent) */
+    --background-light: #FAF0E6; /* Linen */
     --text-dark: #333333;
+    --text-light-secondary: #6c757d; /* Grey for descriptions/secondary text */
     --border-color: #e0e0e0;
     --success-color: #155724;
     --error-color: #721c24;
     --success-bg: #d4edda;
     --error-bg: #f8d7da;
+    --white-color: #ffffff;
+    --light-grey-bg: #f9f9f9;
+    --danger-color: #dc3545;    /* Red for delete */
+    --danger-hover-color: #c82333; /* Darker red */
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.07);
+    --shadow-medium: 0 6px 25px rgba(0, 0, 0, 0.1);
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Body Layout --- */
 body {
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--background-light);
     color: var(--text-dark);
     margin: 0;
-    padding: 20px; /* Padding for spacing */
+    padding: 20px; /* Ensure padding for content spacing */
     line-height: 1.6;
-    /* Center content vertically (useful for login form) */
+    /* Flexbox to center login form initially */
     display: flex;
     justify-content: center;
-    align-items: center; /* Default alignment for login */
+    align-items: center; /* Default alignment (centers login vertically) */
     min-height: 100vh;
-    box-sizing: border-box;
 }
 
-/* Login Container Styles */
+/* --- Login Section --- */
 .login-container {
     max-width: 400px;
-    width: 100%; /* Responsive width */
-    padding: 30px;
-    background-color: #fff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Full width on small screens */
+    padding: 30px 35px;
+    background-color: var(--white-color);
+    box-shadow: var(--shadow-medium);
     border-radius: 8px;
     text-align: center;
-    /* Login section is shown/hidden by JS */
+    /* Managed by JS: display: block; or display: none; */
 }
 
 .login-container h1 {
-    margin-top: 0; /* Remove default top margin */
+    margin-top: 0;
     margin-bottom: 1.5rem;
     color: var(--primary-color);
+    font-size: 1.8rem;
 }
 
 #login-error {
     margin-top: 1rem;
     font-size: 0.9em;
     min-height: 1.2em; /* Prevent layout shift */
+    /* Styling handled by .status.error */
 }
 
 
-/* Main Admin Content Styling */
+/* --- Main Admin Content Area --- */
 #admin-content {
-    display: none; /* Hide by default, shown by JS */
+    display: none; /* Hidden by default, shown by JS */
     width: 100%;
-    max-width: 800px; /* Adjust max-width as needed */
+    max-width: 850px; /* Adjust max-width as needed */
     position: relative; /* For logout button positioning */
-    background-color: #fff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background-color: var(--white-color);
+    box-shadow: var(--shadow-medium);
     border-radius: 8px;
-    padding: 25px 30px; /* Padding inside the main content area */
-    margin: 20px 0; /* Margin for spacing when visible */
+    padding: 30px 35px; /* Padding inside the main content area */
+    margin: 30px 0; /* Margin for spacing when visible */
     box-sizing: border-box;
 }
 
-/* Styles for the actual form container *within* #admin-content */
+/* Styles for the container div *inside* #admin-content */
 #admin-content .admin-container {
-    max-width: 100%; /* Take full width of parent */
-    margin: 0; /* Reset margin */
-    padding: 0; /* Reset padding */
-    background-color: transparent; /* Inherit background */
-    box-shadow: none; /* Remove inner shadow */
-    border-radius: 0; /* Remove inner border-radius */
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none;
+    border-radius: 0;
 }
 
-/* Shared Form Styles */
-h1, h2 {
-    color: var(--primary-color);
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-/* Adjust heading margin when inside admin content */
-#admin-content h1 {
+
+/* --- General Admin Elements (Headings, Forms, Sections) --- */
+#admin-content h1 { /* Main heading inside admin content */
     margin-top: 0;
+    margin-bottom: 2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1.9rem;
 }
 
-h2 {
-    margin-top: 2rem;
+#admin-content h2 { /* Section headings */
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.6rem;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    text-align: left;
 }
+#admin-content section:first-of-type h2 {
+     margin-top: 0; /* No top margin for the very first section heading */
+}
+
 
 hr {
     border: 0;
     height: 1px;
     background-color: var(--border-color);
-    margin: 2.5rem 0;
+    margin: 3rem 0; /* More spacing with hr */
 }
 
 .admin-section {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
 }
 
 .form-group {
-    margin-bottom: 1.2rem;
-    text-align: left; /* Align labels/inputs left */
+    margin-bottom: 1.3rem;
+    text-align: left;
 }
 
 label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: bold;
+    font-weight: 600; /* Slightly bolder labels */
     font-size: 0.95rem;
+    color: var(--text-dark);
 }
 
 input[type="text"],
 input[type="url"],
-input[type="password"] { /* Add password input styling */
+input[type="password"] {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--border-color);
     border-radius: 5px;
-    box-sizing: border-box; /* Include padding in width */
     font-size: 1rem;
     color: var(--text-dark);
+    background-color: #fdfdfd; /* Slightly off-white background */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input:focus {
     outline: none;
     border-color: var(--secondary-color);
-    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.2);
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15); /* Subtle focus shadow */
 }
 
-/* Submit Button Styles (for Login and Add forms) */
+/* Submit Button (for Login and Add forms) */
 .submit-button {
     display: inline-block;
     background: var(--primary-color);
-    color: #fff;
-    padding: 10px 25px; /* Consistent padding */
+    color: var(--white-color);
+    padding: 11px 28px;
     border-radius: 5px;
-    font-weight: bold;
+    font-weight: 600; /* Bolder */
     font-size: 1rem;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
     border: none;
     cursor: pointer;
     margin-top: 0.5rem;
+    text-align: center;
 }
+.form-group + .submit-button { /* If button immediately follows form-group */
+    margin-top: 1rem;
+}
+
 
 .submit-button:hover {
     background: var(--secondary-color);
     color: var(--text-dark);
+    transform: translateY(-1px); /* Slight lift */
 }
 
 .submit-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+    transform: none;
 }
 
-/* Status Message Styles (for Add forms and Login errors) */
+
+/* --- Status Messages --- */
 .status {
-    padding: 10px 15px;
-    margin-bottom: 1rem; /* Adjust spacing */
-    border-radius: 4px;
+    padding: 12px 18px;
+    margin-bottom: 1rem;
+    border-radius: 5px;
     text-align: center;
     font-weight: 500;
-    min-height: 1.5em; /* Prevent layout shift */
+    font-size: 0.95rem;
+    min-height: 1.5em;
     display: none; /* Hidden by default */
-    border: 1px solid transparent; /* Base border */
+    border: 1px solid transparent;
     box-sizing: border-box;
 }
-/* Specifically target status message inside admin content */
-#admin-content #status-message {
-    margin-top: 1.5rem; /* Add space above */
+/* Status message inside main admin content */
+#admin-content #status-message,
+#admin-content #delete-status-message {
+    margin-top: 1.5rem;
 }
-
 
 .status.success {
     color: var(--success-color);
     background-color: var(--success-bg);
-    border-color: var(--success-color); /* Use border-color */
+    border-color: var(--success-color);
     display: block;
 }
 
 .status.error {
     color: var(--error-color);
     background-color: var(--error-bg);
-    border-color: var(--error-color); /* Use border-color */
+    border-color: var(--error-color);
     display: block;
 }
 
 
-/* Logout Button Styles */
+/* --- Logout Button --- */
 .logout-button {
     position: absolute;
-    top: 15px;
-    right: 20px; /* Position inside #admin-content */
-    background-color: #6c757d; /* Grey color */
-    color: white;
-    padding: 8px 15px;
+    top: 20px; /* Adjust positioning */
+    right: 25px;
+    background-color: var(--text-light-secondary);
+    color: var(--white-color);
+    padding: 8px 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: 500;
     transition: background-color 0.3s ease;
-    z-index: 10; /* Ensure it's above other content if overlap occurs */
+    z-index: 10;
 }
 
 .logout-button:hover {
-    background-color: #5a6268;
+    background-color: #5a6268; /* Slightly darker grey */
+}
+
+
+/* --- Displaying Existing Items --- */
+.item-list-container {
+    margin-top: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 15px 20px;
+    min-height: 60px;
+    background-color: var(--light-grey-bg);
+}
+
+.loading-indicator {
+    text-align: center;
+    color: var(--text-light-secondary);
+    font-style: italic;
+    padding: 10px 0;
+}
+
+/* Individual item row */
+.manage-item {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #e7e7e7; /* Lighter border inside list */
+    gap: 15px;
+}
+.manage-item:last-child {
+    border-bottom: none;
+}
+
+/* Item details (image + text) */
+.item-details {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Increased gap */
+    flex-grow: 1;
+    min-width: 250px; /* Prevent excessive shrinking */
+    overflow: hidden;
+}
+
+.item-thumbnail {
+    width: 55px; /* Slightly larger thumbnail */
+    height: 55px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+    border: 1px solid var(--border-color); /* Subtle border */
+}
+
+.item-text {
+    overflow: hidden; /* Needed for ellipsis */
+}
+
+.item-text span {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+.item-text span:first-child { /* Title */
+    font-weight: 600; /* Bolder title */
+    color: var(--text-dark);
+    margin-bottom: 2px;
+}
+.item-text span:last-child { /* Description */
+    font-size: 0.9em;
+    color: var(--text-light-secondary);
+}
+
+
+/* Delete button */
+.delete-button {
+    background-color: var(--danger-color);
+    color: var(--white-color);
+    border: none;
+    padding: 6px 12px; /* Slightly larger padding */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    flex-shrink: 0; /* Prevent shrinking */
+    margin-left: 10px; /* Add some space if wrapping occurs */
+}
+
+.delete-button:hover {
+    background-color: var(--danger-hover-color);
+    transform: scale(1.05); /* Slight scale effect */
+}
+
+.delete-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* --- Responsive Considerations --- */
+@media (max-width: 600px) {
+    body {
+        padding: 10px; /* Less padding on small screens */
+    }
+    .login-container {
+        padding: 20px;
+    }
+    #admin-content {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    .logout-button {
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+    }
+    .item-details {
+        min-width: 200px; /* Adjust for smaller screens */
+    }
 }
