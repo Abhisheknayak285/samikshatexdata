@@ -1,0 +1,127 @@
+/* Basic Admin Styles */
+:root {
+    --primary-color: #800000;
+    --secondary-color: #B8860B;
+    --background-light: #FAF0E6;
+    --text-dark: #333333;
+    --border-color: #e0e0e0;
+    --success-color: #155724;
+    --error-color: #721c24;
+    --success-bg: #d4edda;
+    --error-bg: #f8d7da;
+}
+
+body {
+    font-family: sans-serif;
+    background-color: var(--background-light);
+    color: var(--text-dark);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.admin-container {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 25px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h1, h2 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    margin-top: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 2.5rem 0;
+}
+
+.admin-section {
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="url"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding in width */
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.2);
+}
+
+.submit-button {
+    display: inline-block;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.submit-button:hover {
+    background: var(--secondary-color);
+    color: var(--text-dark);
+}
+
+.submit-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.status {
+    padding: 10px 15px;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 500;
+    min-height: 1.5em; /* Prevent layout shift */
+    display: none; /* Hidden by default */
+}
+
+.status.success {
+    color: var(--success-color);
+    background-color: var(--success-bg);
+    border: 1px solid var(--success-color);
+    display: block;
+}
+
+.status.error {
+    color: var(--error-color);
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-color);
+    display: block;
+}
