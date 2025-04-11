@@ -5,58 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Samiksha Tex - Admin Panel</title>
     <link rel="stylesheet" href="admin.css">
-    </head>
+</head>
 <body>
-    <div class="admin-container">
-        <h1>Samiksha Tex Content Manager</h1>
 
-        <div id="status-message" class="status"></div>
+    <div id="login-section" class="login-container">
+        <h1>Admin Login</h1>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="submit-button">Login</button>
+            <p id="login-error" class="status error" style="display: none;"></p>
+        </form>
+    </div>
 
-        <section class="admin-section">
-            <h2>Add New Gallery Item</h2>
-            <form id="add-gallery-form">
-                <div class="form-group">
-                    <label for="gallery-image-url">Image URL:</label>
-                    <input type="url" id="gallery-image-url" name="imageUrl" required placeholder="https://example.com/image.jpg">
-                </div>
-                <div class="form-group">
-                    <label for="gallery-title">Title:</label>
-                    <input type="text" id="gallery-title" name="title" required placeholder="E.g., Banarasi Silk">
-                </div>
-                <div class="form-group">
-                    <label for="gallery-description">Description:</label>
-                    <input type="text" id="gallery-description" name="description" required placeholder="E.g., Rich gold zari work">
-                </div>
-                 <div class="form-group">
-                    <label for="gallery-category">Category:</label>
-                    <input type="text" id="gallery-category" name="category" placeholder="E.g., silk, cotton, bandhani (lowercase)">
-                </div>
-                <button type="submit" class="submit-button">Add to Gallery</button>
-            </form>
-        </section>
+    <div id="admin-content" style="display: none;">
+         <button id="logout-button" class="logout-button">Logout</button>
+        <div class="admin-container">
 
-        <hr>
+            <h1>Samiksha Tex Content Manager</h1>
+            <div id="status-message" class="status"></div>
 
-        <section class="admin-section">
-            <h2>Add New Arrival Item</h2>
-            <form id="add-arrival-form">
-                <div class="form-group">
-                    <label for="arrival-image-url">Image URL:</label>
-                    <input type="url" id="arrival-image-url" name="imageUrl" required placeholder="https://example.com/new_image.jpg">
-                </div>
-                <div class="form-group">
-                    <label for="arrival-title">Title:</label>
-                    <input type="text" id="arrival-title" name="title" required placeholder="E.g., Pastel Silk Blend">
-                </div>
-                <div class="form-group">
-                    <label for="arrival-description">Description:</label>
-                    <input type="text" id="arrival-description" name="description" required placeholder="E.g., Subtle elegance">
-                </div>
-                <button type="submit" class="submit-button">Add to New Arrivals</button>
-            </form>
-        </section>
+            <section class="admin-section">
+                <h2>Add New Gallery Item</h2>
+                <form id="add-gallery-form">
+                    <div class="form-group">
+                        <label for="gallery-image-url">Image URL:</label>
+                        <input type="url" id="gallery-image-url" name="imageUrl" required placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label for="gallery-title">Title:</label>
+                        <input type="text" id="gallery-title" name="title" required placeholder="E.g., Banarasi Silk">
+                    </div>
+                    <div class="form-group">
+                        <label for="gallery-description">Description:</label>
+                        <input type="text" id="gallery-description" name="description" required placeholder="E.g., Rich gold zari work">
+                    </div>
+                     <div class="form-group">
+                        <label for="gallery-category">Category:</label>
+                        <input type="text" id="gallery-category" name="category" placeholder="E.g., silk, cotton, bandhani (lowercase)">
+                    </div>
+                    <button type="submit" class="submit-button">Add to Gallery</button>
+                </form>
+            </section>
 
+            <hr>
+
+            <section class="admin-section">
+                <h2>Add New Arrival Item</h2>
+                <form id="add-arrival-form">
+                    <div class="form-group">
+                        <label for="arrival-image-url">Image URL:</label>
+                        <input type="url" id="arrival-image-url" name="imageUrl" required placeholder="https://example.com/new_image.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label for="arrival-title">Title:</label>
+                        <input type="text" id="arrival-title" name="title" required placeholder="E.g., Pastel Silk Blend">
+                    </div>
+                    <div class="form-group">
+                        <label for="arrival-description">Description:</label>
+                        <input type="text" id="arrival-description" name="description" required placeholder="E.g., Subtle elegance">
+                    </div>
+                    <button type="submit" class="submit-button">Add to New Arrivals</button>
+                </form>
+            </section>
         </div>
+    </div>
+
     <script src="admin.js"></script>
 </body>
 </html>
