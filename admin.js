@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- VERY INSECURE: Hardcoded Password ---
     // Replace 'yourSecretPassword' with the password you want to use.
     // REMINDER: THIS IS VISIBLE IN BROWSER SOURCE CODE. NOT SECURE AT ALL.
-    const ADMIN_PASSWORD = '1234';
+    const ADMIN_PASSWORD = '@surat1017';
     // -----------------------------------------
 
     // --- Get DOM Elements ---
